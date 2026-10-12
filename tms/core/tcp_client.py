@@ -16,11 +16,11 @@ def make_request(cmd: str, params: Dict[str, str]) -> Dict:
     """
     print(params)
     params_str = "|".join(f"{k}:{v}" for k, v in params.items())
-    req = f"CMD:{cmd}|AUTH:{os.environ["AUTH_TOKEN"]}|{params_str}\r\n"
+    req = f"CMD:{cmd}|AUTH:{os.environ['AUTH_TOKEN']}|{params_str}\r\n"
     print(req)
     
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((os.environ["TMS_ADDRESS"], int(os.environ["TMS_PORT"])))
+    s.connect((os.environ['TMS_ADDRESS'], int(os.environ['TMS_PORT'])))
     s.send(req.encode("utf-8"))
     data = s.recv(4096)
     s.close()
