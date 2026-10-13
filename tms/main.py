@@ -8,9 +8,9 @@ app = FastAPI(title="HappyRobot Logistics API")
 
 app.include_router(tms_router)
 
-fcmsa_app = FastAPI(title=" FCMSA")
+fmcsa_app = FastAPI(title="FMCSA")
 
-@fcmsa_app.get("/check_mc/{mc_number}")
+@fmcsa_app.get("/check_mc/{mc_number}")
 async def check_mc(mc_number: str):
     async with httpx.AsyncClient() as client:
         result = await(client.request("GET", "https://mobile.fmcsa.dot.gov/qc/services/carriers/docket-number/{mc_number}?webKey=cdc33e44d693a3a58451898d4ec9df862c65b954"))
@@ -20,7 +20,7 @@ async def check_mc(mc_number: str):
             media_type=result.headers.get("content-type")
         )
 
-app.mount("/fcmsa", fcmsa_app)
+app.mount("/fmcsa", fmcsa_app)
 
 if __name__ == "__main__":
     import uvicorn
