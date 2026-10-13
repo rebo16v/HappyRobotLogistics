@@ -11,9 +11,14 @@ fmcsa_app = FastAPI(title="FMCSA")
 
 @fmcsa_app.get("/check_mc/{mc_number}")
 async def check_mc(mc_number: str, webKey: str):
-    headers={"Host": "mobile.fmcsa.dot.gov"}
+    headers={"Accept": "*/*",
+             "Accept-Encoding": "deflate, gzip",
+             "User-Agent": "Mozilla/5.0(Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36(KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+             "Host": "mobile.fmcsa.dot.gov"
+             }
     client = httpx.AsyncClient(follow_redirects=True)
-    result = await(client.request("GET", "https://mobile.fmcsa.dot.gov/qc/services/carriers/docket-number/{mc_number}?webKey={webKey}",
+    result = await(client.request("GET",
+                                  f"https://mobile.fmcsa.dot.gov/qc/services/carriers/docket-number/{mc_number}?webKey={webKey}",
                                   headers=headers))
     print(f"RESPONSE: {result.content} \nHEADERS: {result.headers}")
     return Response(status_code=result.status_code, headers=result.headers, content=result.content)
