@@ -10,4 +10,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY tms/ ./tms/
 
 # Run uvicorn referencing the tms module
-CMD ["uvicorn", "tms.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "tms.main:app", "--host", "0.0.0.0", "--port", "8080", "--timeout-keep-alive", "30"]
