@@ -22,7 +22,12 @@ def make_request(cmd: str, params: Dict[str, str]) -> Dict:
     try:
         s.connect((os.environ['TMS_ADDRESS'], int(os.environ['TMS_PORT'])))
         s.send(req.encode("utf-8"))
-        data = s.recv(4096)
+        data = b""
+        while True:
+            chunk = s.recv(4096)
+            if not chunk:
+                break
+            data += chunk
     except socket.timeout:
         return {"error": {"type": "timeout", "message": "Connection timed out"}}
     except ConnectionRefusedError:
@@ -48,9 +53,11 @@ def make_request(cmd: str, params: Dict[str, str]) -> Dict:
             res = {"error": {f.split(":")[0].lower(): f.split(":")[1] for f in
                              recs[0].split("|") if not f.startswith("ERR")}}
         else:
-            res = {"loads": {f.split(":")[0].lower(): f.split(":")[1] for f in field.split("|")} for field in
-                        [rec for rec in recs if len(rec) > 0 and not rec.startswith("END")]}
-
+            if cmd == "LOAD_QUERY":
+                res = {"loads": [{f.split(":")[0].lower(): f.split(":")[1] for f in rec.split("|")}
+                                 for rec in recs if len(rec) > 0 and not rec.startswith("END")]}
+            else:
+                res = {f.split(":")[0].lower(): f.split(":")[1] for f in recs[0].split("|")}
         return res
     except (IndexError, ValueError) as e:
         return {"error": {"type": "parse_error", "message": f"Failed to parse response: {str(e)}"}}
